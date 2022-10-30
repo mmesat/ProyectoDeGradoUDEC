@@ -1,0 +1,309 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <title>ESCUELA DE COMUNICACIONES CENTRO DE INVESTIGACIÓN ETI</title>
+        <meta name="keywords" content="" />
+        <meta name="description" content="" />
+        <link href="styles.css" rel="stylesheet" type="text/css" media="screen" />
+		
+		<!-- Begin JavaScript -->
+
+		<script type="text/javascript" src="lib/jquery-1.3.2.min.js"></script>
+		<script type="text/javascript" src="lib/jquery.tools.js"></script>
+    	<script type="text/javascript" src="lib/cufon.js"></script>
+    	<script type="text/javascript" src="lib/jquery.custom.js"></script>
+		
+        <!-- Begin JavaScript -->
+<script type='text/javascript'>
+
+/***********************************************
+* Carousel Slideshow II- By Harry Armadillo (http://www.codingforums.com/showthread.php?t=58814)
+* Visit Dynamic Drive at http://www.dynamicdrive.com/ for full source code
+* Please keep this notice intact
+***********************************************/
+
+function carousel(params){
+  if(!(params.width>0 && isFinite(params.width)))params.width=100;
+  if(!(params.height>0 && isFinite(params.height)))params.height=100;
+  if(!(params.sides>2 && isFinite(params.sides)))params.sides=4;
+  if(!(params.steps>0 && params.steps<100 && isFinite(params.steps)))params.steps=20;
+  if(!(params.speed>0 && isFinite(params.speed)))params.speed=8;
+  if(!(params.image_border_width>=0 && isFinite(params.image_border_width)))params.image_border_width=0;
+  if(isFinite(params.id)||!params.id)params.id='bad_id_given_'+Math.random();
+  
+  document.write("<div style='position:relative;overflow:hidden;' id='"+params.id.replace(/[^a-zA-Z0-9]+/g,'_')+"'></div>");
+  var cdiv=document.getElementById(params.id.replace(/[^a-zA-Z0-9]+/g,'_'))
+  cdiv.style.width=params.width+'px';
+  cdiv.style.height=params.height+'px';
+  cdiv.style.border=params.border;
+  cdiv.style.position='relative';
+  cdiv.style.overflow='hidden';
+  cdiv.title=params.id;
+    
+  var counter=0,spinning=true,interval=Math.floor(60000/params.sides/params.steps/params.speed)-5;
+  interval=isNaN(interval)?200:interval;
+  var img_position=[],images=[],img_dimension=[];
+  var img_index=params.images.length+1,img_index_cap=2*params.images.length;
+  var faces=Math.ceil(params.sides/2), dimension, direction, targ, attr, faraway;
+
+  function init(){
+    if(params.direction=="left" || params.direction=="right"){
+      direction=params.direction;
+      dimension="width";
+      }
+    else if(params.direction=="top" || params.direction=="bottom"){
+      direction=params.direction;
+      dimension="height";
+      }
+    else {
+      direction="left";
+      dimension="width";
+      }      
+    faraway=(direction=="left"||direction=="top")?'-20000px':'20000px';
+    cdiv.style[dimension]=params[dimension]/(params.size_mode=='image'?Math.sin(Math.PI/params.sides):1)+'px';
+    var img=new Image();
+    img.style.position='absolute';
+    img.style[direction]=faraway;
+    img.style.width=params.width-2*params.image_border_width+'px';
+    img.style.height=params.height-2*params.image_border_width+'px';
+    img.style.border=(params.image_border_width||0)+'px solid '+params.image_border_color;
+  
+    for(var i=0;i<params.images.length;i++){
+      images[i]=img.cloneNode(true);
+      images[i].src=params.images[i];
+      if(params.links && params.links[i] && params.links[i]!=''){
+        targ=params.lnk_targets && params.lnk_targets[i]||params.lnk_base||'new';
+        if(targ=="_blank"){
+          attr=(params.lnk_attr && params.lnk_attr[i])?",'"+params.lnk_attr[i]+"'":"";
+          images[i].onclick=new Function("window.open('"+params.links[i]+"','"+targ+"'"+attr+")");
+          }
+        else if(targ.substr(0,1)=="_"){
+          images[i].onclick=new Function(targ.substr(1)+".location='"+params.links[i]+"'");
+          }
+        else{
+          attr=(params.lnk_attr && params.lnk_attr[i])?",'"+params.lnk_attr[i]+"'":"";
+          images[i].onclick=new Function("var t='"+targ+"';if(window[t]){try{window[t].close()}catch(z){}}window[t]=window.open('"+params.links[i]+"',t"+attr+");window[t].focus()");
+          }
+        images[i].style.cursor=document.all?'hand':'pointer';
+        }
+
+      if(params.titles && params.titles[i] && params.titles[i]!='')
+        images[i].title=params.titles[i];
+      if(document.all)
+        images[i].alt=images[i].title;
+      images[i+params.images.length]=images[i];
+      if(params.images.length==faces)
+        images[i+2*params.images.length]=images[i];
+      cdiv.appendChild(images[i]);
+      }
+  
+    var face_size=params.size_mode=='image'?params[dimension]:params[dimension]*Math.sin(Math.PI/params.sides);
+    var face_offset=params[dimension]*Math.cos(Math.PI/params.sides)/(params.size_mode=='image'?Math.sin(Math.PI/params.sides):1)/2-.5;
+    var pi_piece=2*Math.PI/params.steps/params.sides;
+    for(i=0;i<=params.steps*faces;i++){
+      img_dimension[i]=face_size*Math.sin(pi_piece*i);
+      img_position[i]=(i<params.steps*params.sides/2)?Math.floor(params[dimension]/2/(params.size_mode=='image'?Math.sin(Math.PI/params.sides):1)-face_offset*Math.cos(pi_piece*i)-img_dimension[i]/2)+'px':faraway;
+      img_dimension[i]=img_dimension[i]-2*params.image_border_width>1?Math.ceil(img_dimension[i])-2*params.image_border_width+'px':'1px';
+      }
+    }
+  init();
+
+  cdiv.rotate = function(){
+    setTimeout('document.getElementById("'+cdiv.id+'").rotate()',interval);
+    if(!spinning) return;
+    if(++counter>=params.steps){
+      counter=0;
+      if(++img_index>=img_index_cap)
+        img_index=params.images.length;
+      }
+    images[img_index-faces].style[direction]=faraway;
+    for(var i=faces-1;i>=0;i--){
+      images[img_index-i].style[direction]=img_position[counter+i*params.steps];
+      images[img_index-i].style[dimension]=img_dimension[counter+i*params.steps];
+      }
+    }
+  cdiv.onmouseover=function(){
+    spinning=false;
+    }
+  cdiv.onmouseout=function(){
+    spinning=true;
+    }
+  setTimeout('document.getElementById("'+cdiv.id+'").rotate()',100);
+  }
+</script>
+        
+        
+    </head>
+<body>
+        <div id="wrap">
+            <div id="logo">
+                <p><img src="images/BATALLON.gif" width="98" height="103" alt="ima" /> <span class="cambio">CENTRO DE INVESTIGACIÓN<img src="images/logo1.gif" width="102" height="109" alt="imagen2" /></span></p>
+        <p>&nbsp;</p>
+                <p><span class="cambio">COMUNICACIONES</span><span class="cambio"> MILITARES</span></p>
+                <h1>&nbsp;</h1>
+          </div>
+
+            <div id="content_top"></div>
+            <div id="content">
+                <div id="menu">
+                    <ul>
+                        <li><a href="entrada.html">Home</a></li>
+                        <li><a href="institucion.html">INSTITUCIONAL</a></li>
+                        <li></li>
+                        <li><a href="investigacion.html" class="active">INVESTIGACIÓN</a></li>
+                        <li><a href="contact.html">CoRREO INSTITUCIONAL</a></li>
+                        <li><a href="revista.html">REVISTA</a></li>
+                    </ul>
+                </div>
+                <div id="header">
+                
+                <div style="margin-top: 1em; font-weight: bold;"></div>
+
+<script type='text/javascript'>
+carousel({id:'Amazon Books', //Enter arbitrary but unique ID of this slideshow instance
+          border:'',
+          size_mode:'image', //Enter "carousel" or "image". Affects the width and height parameters below.
+          width:480, //Enter width of image or entire carousel, depending on above value
+          height:287, //Enter height of image or entire carousel, depending on above value
+          sides:6, //# of sides of the carousel. What's shown = sides/2. Even integer with sides/2< total images is best
+          steps:35, //# of animation steps. More = smoother, but more CPU intensive
+          speed:1.5, //Speed of slideshow. Larger = faster.
+          direction:'left', //Direction of slideshow. Enter "top", "bottom", "left", or "right"
+          images:['images/imagen2.jpg',
+                  'images/heli1.jpg',
+                  'images/logobatallon.jpg',
+									'images/nuevo_2011.jpg'],
+          links: ['http://www.dynamicdrive.com', //enter link URLs, or for no links, empty array instead (links :[])
+									'http://www.javascriptkit.com',
+									'http://www.codingforums.com',
+									'http://www.cssdrive.com'],
+          titles:['Book #1',
+									'Book #2',
+									'Book #3',
+									'Book #4'],
+          image_border_width:0,
+          image_border_color:'blue'
+          });
+</script>
+                
+                    <div id="slider_bg">
+								<div class="waveshow">									
+								</div> <!-- waveshow -->
+							</div> <!-- slider_bg -->	
+                </div>
+
+                <div id="index_content">
+                  <div class="contact_right">
+                    <div class="contact_right_top"></div>
+                    <div class="bg_right">
+                      <div class="contact_right_bg about">
+                        <h3>&nbsp;</h3>
+                        <div class="bor_right"></div>
+                        <p><a href="informacion.html">CONTENIDO INFORMACIÓN</a></p>
+                        <div class="read2"></div>
+                        <div class="bor_right"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="contact_left">
+                  <div class="contact_left_top"></div>
+                        <div class="contact_left_bg">
+                            <p>&nbsp;</p>
+<div class="bor"></div>
+                          <h3> DESCRIPCIÓN DEL SISTEMA DE CIENCIA Y TECNOLOGÍA DEL EJÉRCITO NACIONAL (SICTE)</h3>
+                          <p>&nbsp;</p>
+                          <p>&nbsp;</p>
+<p>&nbsp;</p>
+                          <p>MISIÓN:</p>
+                          <p>&nbsp;</p>
+                          <p>El Sistema de Ciencia y Tecnología es el motor que a través del Departamento de Investigación, Ciencia y Tecnología impulsa la estructura investigativa, con el propósito de solventar las necesidades más sentidas en las diferentes áreas de la Fuerza.</p>
+                          <p>&nbsp;</p>
+                          <p>VISIÓN:</p>
+                          <p>&nbsp;</p>
+                          <p>El Sistema de Ciencia y Tecnología se establece como la fórmula especial para el planeamiento y desarrollo de la innovación tecnológica para las etapas de consolidación y del posconflicto en nuestro país con alcances de alto nivel estratégico.</p>
+                          <p>&nbsp;</p>
+                          <p>ORGANIZACIÓN</p>
+                          <p>&nbsp;</p>
+                          <ul type="square">
+                            <li class="viñeta22">Comité Directivo de Ciencia y Tecnología (CODICITE)</li>
+                            <li class="viñeta22">Jefatura de Educación y Doctrina del Ejército (JEDOC)</li>
+                            <li class="viñeta22">Departamento de Investigación, Ciencia y Tecnología (DICTE)</li>
+                            <li class="viñeta22">Centro de Investigación Cientifíca y de Desarrollo Tecnológico del Ejército (CICDETE)</li>
+                            <li class="viñeta22">Subsistemas de Ciencia y Tecnología (09) (SUBICTE)</li>
+                            <li class="viñeta22">Comités de Ciencia Tecnología (COCITE)</li>
+                            <li class="viñeta22">Unidades Coordinadoras (UNCOR)</li>
+                            <li class="viñeta22">Centros de Investigación (CEINV)</li>
+                            <li class="viñeta22">Unidades Militares (UM)</li>
+                            <li class="viñeta22">Grupos de Investigación (GRUINV)</li>
+                          </ul>
+<p>&nbsp;</p>
+                          <p>El Sistema está encabezado y orientado en el desarrollo de su labor por el Comité Directivo de Ciencia y Tecnología (CODICITE), el cual fija y supervisa los parámetros generales para la implementación del sistema, actuando bajo los lineamientos impartidos por el Departamento de Planeación del Ejército y observando la normatización del Modelo Estándar de Control Interno. El sistema tiene como ente de dirección, control y evaluación a la Jefatura de Educación y Doctrina a través del Departamento de Investigación, Ciencia y Tecnología (DICTE).</p>
+                          <p>&nbsp;</p>
+                          <p>Existen 9 subsistemas que desarrollan las políticas de I + D + i dadas por el CODICITE y sirven como enlace con el DICTE, cada uno de los subsistemas corresponde a una de las áreas de investigación del Ejército, y se encuentran a la cabeza de la unidad que en correspondencia con cada línea tenga el mayor indice de producción o la mayor capacidad, estas unidades se denominan Unidad Coordinadora (UNCOR) y cuentan cada una con un Centro de Investigación (CEINV) dotado con los recursos y capacidades específicas que garanticen la investigación, el desarrollo tecnológico y la innovación de su respectivo campo; el subsistema es conformado por las unidades que en función de sus programas académicos y cursos ofertados, adelantan proyectos en las áreas del conocimiento que son integradas en cada línea.</p>
+                          <p>&nbsp;</p>
+                          <p>Los productos de los 9 subsistemas se encauzan por medio del DICTE que verifica que los proyectos cumplan los requisitos de fondo y de forma establecidos para ser aprobados, devueltos o rechazados; aquellos que sean aprobados serán presentados ante el CODICITE para ser apoyados con los recursos necesarios y se entregarán al Centro de Investigación Científica y de Desarrollo Tecnológico del Ejército (CICDETE), el grupo de investigación de origen; aquellos que no sean aprobados podrán ser devueltos para su perfeccionamiento o para que se profundice en el tema; aquellos que no cumplan con los requisitos mínimos serán archivados.</p>
+                          <p>&nbsp;</p>
+                          <p>Cada una de las unidades cuenta con al menos un grupo de investigación debidamente conformado de acuerdo a los requerimientos determinados por el DICTE, estos grupos se alimentan de los trabajos de grado o trabajos con énfasis en investigación generados por los alumnos que cursan sus estudios en esa unidad o por aquellos emanados de su propia iniciativa; en todos los casos los proyectos que sean abordados oficialmente por un grupo de investigación deberán haber sido sometidos a estudio por parte del Comité de Ciencia y Tecnología (COCITE) de cada subsistema, el cual de acuerdo a su concepto, lo remitirá para su aprobación al DICTE, éste emitirá a su vez un concepto técnico favorable o desfavorable, en caso favorable impartirá instrucciones para su ejecución, seguimiento y control; en consecuencia la unidad coordinadora de subsistema (UNCOR) autorizará mediante acta su cumplimiento y la unidad ejecutora y el grupo de investigación se ajustarán a esas directrices.</p>
+                          <p>&nbsp;</p>
+                          <p>Los productos tangibles que sean revisados y aprobados por el CODICITE, serán protegidos mediante la aplicación de la normatividad internacional, nacional e institucional vigente y serán presentados ante INDUMIL, la Jefatura Logística o la unidad que pueda adelantar su implementación o el proceso para su producción industrial.</p>
+                          <p>&nbsp;</p>
+                          <p>Para el caso de productos intangibles, serán protegidos teniendo en cuenta lo establecido por la Guía de Propiedad Intelectual y Transferencia Tecnológica del ministerio de defensa y las que tenga vigencia a nivel nacional, de autor, de acuerdo a su área de aplicabilidad se realizarán las gestiones que permitán su práctica, efectuando un seguimiento durante un lapso no menor a un año.                          </p>
+                          <p>&nbsp;</p>
+                          <p>&nbsp;</p>
+<div class="read"></div>
+
+
+
+                            <div style="clear: both"></div>
+</div>
+                        <div class="contact_left_bot"></div>
+                    </div>
+                    <p>&nbsp;</p>
+            <p>&nbsp;</p>
+                    <div style="clear: both"></div>
+                </div>
+
+
+                <div id="footer_box">
+                    <div id="footer_box_top"></div>
+                    <div id="footer_box_bg">
+                      <div style="clear: both">
+                        <div class="foot_col1">
+                          <h3>Contáctenos</h3>
+                          <div class="pad_left" style="background: url(images/home.png) no-repeat left center"> Centro de Investigación</div>
+                          <div class="pad_left"> Cantón de Comunicaciones ESCOM</div>
+                          <div class="pad_left" style="background: url(images/phone.png) no-repeat left center">Calle 5  con carrera 15 Dos Caminos </div>
+                          <div class="pad_left">Facatativa, Cundinamarca</div>
+                          <div class="pad_left" style="background: url(images/contact.png) no-repeat left center">Conmutador (57) (1) 8422655</div>
+                        </div>
+                        <div class="foot_col2">
+                          <h3>&nbsp;</h3>
+                        </div>
+                        <div class="foot_col3">
+                          <h3>CHAT</h3>
+                          <p><a href="chat.html">Haz click aquí para ingresar..</a></p>
+                        </div>
+                        <div class="foot_col4">
+                          <h3>Siguenos en</h3>
+                          <div class="link2"><a href="http://www.facebook.com/home.php?sk=group_207640105925631"> Facebook</a></div>
+                          <div class="link4"><a href="http://www.twiigo.com/CIETIESCOM"> Twitter</a></div>
+                        </div>
+                        <div style="clear: both"></div>
+                      </div>
+                    </div>
+                    <div id="footer_box_bot"></div>
+                </div>
+            </div>
+            <div id="content_bot"></div>
+        </div>
+    <div id="footer">
+      <div class="red_hr"></div>
+            <div class="red_hr"></div>
+                <p>Copyright  2011. <a href="#">Universidad de Cundinamarca. ESCOM</a><a href="#"></a></p>
+                <p>Diseñado por Erika Castañeda y Miguel Mesa</p>
+                <p>Estudiantes Ing. de Sistemas</p>
+<p>&nbsp;</p>
+        </div>
+    </body>
+</html>
